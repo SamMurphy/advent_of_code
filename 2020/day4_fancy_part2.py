@@ -1,6 +1,8 @@
 import re
 
-parser = re.compile(
+part1_parser = re.compile(r'(byr:(?P<byr>[#|\w]+)(\s|$)+|iyr:(?P<iyr>[#|\w]+)(\s|$)+|eyr:(?P<eyr>[#|\w]+)(\s|$)+|hgt:(?P<hgt>[#|\w]+)(\s|$)+|hcl:(?P<hcl>[#|\w]+)(\s|$)+|ecl:(?P<ecl>[#|\w]+)(\s|$)+|pid:(?P<pid>[#|\w]+)(\s|$)+|cid:(?P<cid>[#|\w]+)(\s|$)+)*')
+
+part2_parser = re.compile(
     r'(byr:(?P<byr>\d{4})(\s|$)+|iyr:(?P<iyr>\d{4})(\s|$)+|eyr:(?P<eyr>\d{4})(\s|$)+|hgt:(?P<hgt>\d+(cm|in))(\s|$)+|hcl:#(?P<hcl>[0-9|a-f]{6})(\s|$)+|ecl:(?P<ecl>(amb|blu|brn|gry|grn|hzl|oth))(\s|$)+|pid:(?P<pid>[0-9]{9})(\s|$)+|cid:(?P<cid>\d+)(\s|$)+)*')
 height_parser = re.compile(r'^(?P<height>\d+)(?P<unit>cm|in)$')
 
@@ -29,7 +31,7 @@ def validate_passport(passport):
     return False
 
 
-def parse_file(file_name):
+def parse_file(file_name, parser):
     passports = open(file_name, "r").read().split("\n\n")
     for i in range(0, len(passports)):
         # remove newlines that are in the middle
@@ -42,16 +44,24 @@ def parse_file(file_name):
     return passports
 
 
-def solve(file_name):
-    passports = parse_file(file_name)
+def solve_part2(file_name):
+    passports = parse_file(file_name, part2_parser)
     valid_count = 0
     for passport in passports:
         valid_count += validate_passport(passport)
     return valid_count
 
+def solve_part1(file_name):
+    passports = parse_file(file_name, part1_parser)
+    valid_count = 0
+    for passport in passports:
+        valid_count += set(passport.keys()) >= required_fields
+    return valid_count
 
-# file_name = "input_day4_test.txt"
+
+#file_name = "input_day4_test.txt"
 #file_name = "input_day4_test2.txt"
 file_name = "input_day4.txt"
 
-print(f'Part 2: There are {solve(file_name)} valid passports')
+print(f'Part 1: There are {solve_part1(file_name)} valid passports')
+print(f'Part 2: There are {solve_part2(file_name)} valid passports')
