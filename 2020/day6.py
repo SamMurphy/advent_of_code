@@ -9,21 +9,20 @@ def solve_part1(file_name):
 
 def solve_part2(file_name):
     groups = parse_file(file_name)
-    return sum([len(set.intersection(*[set(x) for x in block.split()])) for block  in groups])
+    return sum([len(set.intersection(*[set(person) for person in group.split()])) for group in groups])
 
-test_file = "input_day5_test.txt"
-file_name = "input_day5.txt"
+file_name = "input_day5_test.txt"
 
-test = solve_part1(test_file)
+test = solve_part1(file_name)
 assert(test == 11)
-print(f'Test Part 1: The sum of the questions is: {test}')
+print(f'Test Part 1: Unique questions answered: {test}')
 
-result = solve_part1(file_name)
-print(f'Part 1: The sum of the questions is: {result}')
-
-test = solve_part2(test_file)
+test = solve_part2(file_name)
 assert(test == 6)
-print(f'Test Part 2: The sum of the questions everyone answered is: {test}')
+print(f'Test Part 2: Questions everyone answered: {test}')
 
+file_name = "input_day5.txt"
+result = solve_part1(file_name)
+print(f'Part 1: Unique questions answered: {result}')
 result = solve_part2(file_name)
-print(f'Part 1: The sum of the questions everyone answered is: {result}')
+print(f'Part 2: Questions everyone answered: {result}')
