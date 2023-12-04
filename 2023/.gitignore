@@ -13,3 +13,7 @@
 
 # Ignore build files
 *.exe
+
+# Recursively ignore all files matching ".txt"
+# Not meant to distribute the inputs
+**/*.txt
