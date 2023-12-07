@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
-#include <algorithm>
+#include <vector>
 
 #include "../Log.h"
 
@@ -81,9 +81,102 @@ int Part1(std::string input)
     return total;
 }
 
+struct Item 
+{
+    int startPos;
+    int endPos;
+    int lineNumber;
+    std::string text;
+    bool isCog;
+
+    Item() : startPos(-1), endPos(-1), lineNumber(-1), text(""), isCog(false) {}
+};
+
+bool IsCog(std::string str)
+{
+    const std::regex symbolPattern("[*]");
+    std::smatch match;
+    if (std::regex_search(str, match, symbolPattern))
+    {
+        if (match.ready())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void MatchPatten(std::string pattern, std::string line, std::vector<Item>& items, int lineNumber, bool isCog = false)
+{
+    std::regex rgxPattern(pattern);
+    std::sregex_iterator currentMatch(line.begin(), line.end(), rgxPattern);
+    std::sregex_iterator lastMatch = std::sregex_iterator();
+    while (currentMatch != lastMatch)
+    {
+        std::smatch match = *currentMatch;
+        std::string number = match.str(1);
+
+        Item item;
+        item.text = number;
+        item.startPos = match.position();
+        item.endPos = std::min(int(match.position() + match.length()), int(line.length()));
+        item.lineNumber = lineNumber;
+        item.isCog = isCog;
+
+        items.push_back(item);
+
+        currentMatch++;
+    }
+}
+
 int Part2(std::string input)
 {
-    return 0;
+    // Read though the file line by line
+    std::ifstream file(input);
+    std::string line;
+    std::vector<Item> items;
+    int lineNumber = 0;
+    while (std::getline(file, line))
+    {
+        MatchPatten("(\\d+)", line, items, lineNumber);
+        MatchPatten("([*])", line, items, lineNumber, true);
+        lineNumber++;
+    }
+
+    int total = 0;
+    for (auto &item : items)
+    {
+        if (item.isCog)
+        {
+            int adjCount = 0;
+            int product = 1;
+            for (auto &neighbour: items)
+            {
+                // Check it's a number
+                if (neighbour.isCog == false)
+                {
+                    if (neighbour.lineNumber <= item.lineNumber + 1 &&
+                        neighbour.lineNumber >= item.lineNumber - 1)
+                    {
+                        // Check if it's adjacent
+                        if (item.startPos >= neighbour.startPos - 1 &&
+                            item.endPos <= neighbour.endPos + 1)
+                        {
+                            adjCount++;
+                            int partNumber = std::stoi(neighbour.text);
+                            product *= partNumber;
+                        }
+                    }
+                }
+            }
+            if (adjCount == 2)
+            {
+                total += product;
+            }
+        }
+    }
+
+    return total;
 }
 
 int main()
